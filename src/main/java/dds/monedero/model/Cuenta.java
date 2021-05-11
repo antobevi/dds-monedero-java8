@@ -52,8 +52,8 @@ public class Cuenta {
       throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
           + " diarios, límite: " + limite);
     }
-    // Middle Man
-    new Movimiento(LocalDate.now(), cuanto, false).agregateA(this);
+
+    this.agregarMovimiento(LocalDate.now(), cuanto, false);
   }
 
   public void agregarMovimiento(LocalDate fecha, double cuanto, boolean esDeposito) {
