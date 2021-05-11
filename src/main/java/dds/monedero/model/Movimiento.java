@@ -6,6 +6,7 @@ public class Movimiento {
   private LocalDate fecha;
   //En ningún lenguaje de programación usen jamás doubles para modelar dinero en el mundo real
   //siempre usen numeros de precision arbitraria, como BigDecimal en Java y similares
+  // Primitive obssesion
   private double monto;
   private boolean esDeposito;
 
@@ -41,11 +42,6 @@ public class Movimiento {
 
   public boolean isExtraccion() {
     return !esDeposito;
-  }
-
-  public void agregateA(Cuenta cuenta) {
-    cuenta.setSaldo(calcularValor(cuenta));
-    cuenta.agregarMovimiento(fecha, monto, esDeposito);
   }
 
   public double calcularValor(Cuenta cuenta) {
