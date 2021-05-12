@@ -21,7 +21,7 @@ public class Cuenta {
     this.movimientos = movimientos;
   }
 
-  public void poner(BigDecimal cuanto) {
+  public void depositar(BigDecimal cuanto) {
 
     Validador validarMontoNegativo = new ValidadorMontoNegativo();
     validarMontoNegativo.validar(cuanto, saldo);
@@ -32,7 +32,7 @@ public class Cuenta {
     this.agregarMovimiento(LocalDate.now(), cuanto, true);
   }
 
-  public void sacar(BigDecimal cuanto) {
+  public void extraer(BigDecimal cuanto) {
 
     Validador validarMontoNegativo = new ValidadorMontoNegativo();
     validarMontoNegativo.validar(cuanto, saldo);
