@@ -1,9 +1,5 @@
 package dds.monedero.model;
 
-import dds.monedero.exceptions.MaximaCantidadDepositosException;
-import dds.monedero.exceptions.MaximoExtraccionDiarioException;
-import dds.monedero.exceptions.SaldoMenorException;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,7 +10,7 @@ public class Cuenta {
   private List<Movimiento> movimientos = new ArrayList<>();
 
   public Cuenta() {
-    saldo.equals(0);
+    saldo.equals(new BigDecimal(0));
   }
 
   public Cuenta(BigDecimal montoInicial) {
@@ -30,9 +26,8 @@ public class Cuenta {
     Validador validarMontoNegativo = new ValidadorMontoNegativo();
     validarMontoNegativo.validar(cuanto, saldo);
 
-    if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) {
-      throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
-    }
+    Validador validarLimiteDepositos = new ValidadorLimiteDepositos();
+    validarLimiteDepositos.validar(this.cantidadDepositos(), saldo);
 
     this.agregarMovimiento(LocalDate.now(), cuanto, true);
   }
@@ -42,19 +37,24 @@ public class Cuenta {
     Validador validarMontoNegativo = new ValidadorMontoNegativo();
     validarMontoNegativo.validar(cuanto, saldo);
 
-    if (getSaldo().subtract(cuanto).signum() == -1) {
-      throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
-    }
+    Validador validarLimiteExtraccion = new ValidadorLimiteExtraccion();
+    validarLimiteExtraccion.validar(getSaldo().subtract(cuanto), saldo);
 
-    BigDecimal montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
-    BigDecimal limitePorDia = new BigDecimal(1000);
-    BigDecimal montoLimite = montoExtraidoHoy.subtract(limitePorDia);
-    if (cuanto.max(montoLimite) == cuanto) {
-      throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
-          + " diarios, límite: " + montoLimite);
-    }
+    Validador validarLimiteExtraccionDiaria = new ValidadorLimiteExtraccionDiaria();
+    validarLimiteExtraccionDiaria.validar(cuanto, this.montoLimite());
 
     this.agregarMovimiento(LocalDate.now(), cuanto, false);
+  }
+
+  public BigDecimal montoLimite() {
+    BigDecimal montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
+    return montoExtraidoHoy.subtract(new BigDecimal(1000));
+  }
+
+  public BigDecimal cantidadDepositos() {
+    BigDecimal cantDepositos = new BigDecimal(getMovimientos().stream()
+        .filter(movimiento -> movimiento.isDeposito()).count());
+    return cantDepositos;
   }
 
   public void agregarMovimiento(LocalDate fecha, BigDecimal cuanto, boolean esDeposito) {
