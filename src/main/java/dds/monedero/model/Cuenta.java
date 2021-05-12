@@ -2,7 +2,6 @@ package dds.monedero.model;
 
 import dds.monedero.exceptions.MaximaCantidadDepositosException;
 import dds.monedero.exceptions.MaximoExtraccionDiarioException;
-import dds.monedero.exceptions.MontoNegativoException;
 import dds.monedero.exceptions.SaldoMenorException;
 
 import java.math.BigDecimal;
@@ -27,9 +26,9 @@ public class Cuenta {
   }
 
   public void poner(BigDecimal cuanto) {
-    if (cuanto.signum() == -1) {
-      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
-    }
+
+    Validador validarMontoNegativo = new ValidadorMontoNegativo();
+    validarMontoNegativo.validar(cuanto, saldo);
 
     if (getMovimientos().stream().filter(movimiento -> movimiento.isDeposito()).count() >= 3) {
       throw new MaximaCantidadDepositosException("Ya excedio los " + 3 + " depositos diarios");
@@ -39,9 +38,10 @@ public class Cuenta {
   }
 
   public void sacar(BigDecimal cuanto) {
-    if (cuanto.signum() == -1) {
-      throw new MontoNegativoException(cuanto + ": el monto a ingresar debe ser un valor positivo");
-    }
+
+    Validador validarMontoNegativo = new ValidadorMontoNegativo();
+    validarMontoNegativo.validar(cuanto, saldo);
+
     if (getSaldo().subtract(cuanto).signum() == -1) {
       throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
     }
