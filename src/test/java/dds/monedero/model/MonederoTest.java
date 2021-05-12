@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MonederoTest {
   private Cuenta cuenta;
@@ -86,6 +85,20 @@ public class MonederoTest {
     Movimiento nuevoMovimiento = new Movimiento(LocalDate.now(), new BigDecimal(100),true);
     cuenta.modificarSaldo(nuevoMovimiento);
     assertEquals(cuenta.getSaldo(), new BigDecimal(1050));
+  }
+
+  @Test
+  public void FueDepositadoElDia() {
+    LocalDate fecha = LocalDate.of(2021,6,1);
+    Movimiento deposito = new Movimiento(fecha, new BigDecimal(500), true);
+    assertTrue(deposito.fueDepositado(fecha));
+  }
+
+  @Test
+  public void FueExtraidoElDia() {
+    LocalDate fecha = LocalDate.of(2021,9,21);
+    Movimiento extraccion = new Movimiento(fecha, new BigDecimal(100), false);
+    assertTrue(extraccion.fueExtraido(fecha));
   }
 
 }
